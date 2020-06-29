@@ -18,7 +18,7 @@ app.get('/api/sauces', (req, res, next) => {
             name: 'Chipotle',
             manufacturer: 'Heinz',
             description: 'Une magnifique sauce au Chipotle',
-            mainPepper: 'Chiotle',
+            mainPepper: 'Chipotle',
             imageUrl: 'À venir',
             heat: 4,
             likes: 0,
