@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
+const jsonwt = require('jsonwebtoken');
 
 
 exports.signup = (req, res, next) => {
@@ -14,25 +15,29 @@ exports.signup = (req, res, next) => {
           .catch(error => res.status(400).json({ error }));
       })
       .catch(error => res.status(500).json({message: 'Impossible d\'enregistrer le nouvel utilisateur'}));
-  };
+};
 
 exports.login = (req, res, next) => {
-    User.findOne({email: req.body.email})
-        .then(user => {
-            if(!user){
-                return res.status(401).json({error: 'Utilisateur non trouvé !'});
+    User.findOne({ email: req.body.email })
+      .then(user => {
+        if (!user) {
+          return res.status(401).json({ error: 'Utilisateur non trouvé !' });
+        }
+        bcrypt.compare(req.body.password, user.password)
+          .then(valid => {
+            if (!valid) {
+              return res.status(401).json({ error: 'Mot de passe incorrect !' });
             }
-            bcrypt.compare(req.body.password, user.password)
-                .then(valid => {
-                    if(!valid){
-                        return res.status(401).json({error: 'Mot de passe incorrect !'});
-                    }
-                    return res.status(200).json({
-                        userId: user._id,
-                        token: 'TOKEN'
-                    });
-                })
-                .catch(error => res.status(500).json({error}))
-        })
-        .catch(error => res.status(500).json({error}));
+            res.status(200).json({
+              userId: user._id,
+              token: jsonwt.sign(
+                { userId: user._id },
+                '936A8467672E5466CF266A93651CC',
+                { expiresIn: '24h' }
+              )
+            });
+          })
+          .catch(error => res.status(500).json({ error }));
+      })
+      .catch(error => res.status(500).json({ error }));
 };
