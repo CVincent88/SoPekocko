@@ -6,6 +6,7 @@ const app = express();
 
 const Sauce = require('./models/Sauce');
 
+// Logique de connexion à MongoDB
 mongoose.connect('mongodb+srv://SoPekocko_username:SoPekocko_password@sopekocko.wyaor.mongodb.net/<dbname>?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
@@ -22,7 +23,7 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 
-
+// Middleware pour l'ajout de sauce
 app.post('/api/sauces', (req, res, next) => {
     const sauce = new Sauce({
         ...req.body
@@ -32,25 +33,18 @@ app.post('/api/sauces', (req, res, next) => {
         .catch(error => res.status(400).json({error}));
 });
 
-// Middleware test
+// Middleware de récupération d'une sauce en particulier
+app.get('/api/sauces/:id', (req, res, next) => {
+    Sauce.findOne({ _id: req.params.id})
+        .then(sauce => res.status(200).json(sauce))
+        .catch(error => res.status(404).json({error}));
+});
+
+// Middleware de récupération de toutes les sauces
 app.get('/api/sauces', (req, res, next) => {
-    const sauces = [
-        {
-            id: 'odifsfds',
-            userId: 'Ksdfosnvsfbwi',
-            name: 'Chipotle',
-            manufacturer: 'Heinz',
-            description: 'Une magnifique sauce au Chipotle',
-            mainPepper: 'Chipotle',
-            imageUrl: 'À venir',
-            heat: 4,
-            likes: 0,
-            dislikes: 0,
-            usersLiked: [],
-            usersDisliked: []
-        }
-    ]
-    res.status(200).json(sauces);
+    Sauce.find()
+        .then(sauces => res.status(200).json(sauces))
+        .catch(error => res.status(400).json({error}));
 });
 
 module.exports = app;
