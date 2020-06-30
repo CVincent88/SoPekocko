@@ -13,10 +13,4 @@ const sauceSchema = mongoose.Schema({
     usersDisliked: {type: [String], required: true},
 });
 
-const userSchema = mongoose.Schema({
-    userId: {type: String, required: true},
-    email: {type: String, required: true},
-    password: {type: String, required: true},
-});
-
 module.exports = mongoose.model('Sauce', sauceSchema);
