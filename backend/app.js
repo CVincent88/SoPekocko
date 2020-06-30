@@ -1,6 +1,16 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 const app = express();
+
+const Sauce = require('./models/Sauce');
+
+mongoose.connect('mongodb+srv://SoPekocko_username:SoPekocko_password@sopekocko.wyaor.mongodb.net/<dbname>?retryWrites=true&w=majority',
+  { useNewUrlParser: true,
+    useUnifiedTopology: true })
+  .then(() => console.log('Connexion à MongoDB réussie !'))
+  .catch(() => console.log('Connexion à MongoDB échouée !'));
 
 // Middleware permettant l'accès à l'API depuis n'importe quelle origine
 app.use((req, res, next) => {
@@ -10,6 +20,19 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use(bodyParser.json());
+
+
+app.post('/api/sauces', (req, res, next) => {
+    const sauce = new Sauce({
+        ...req.body
+    });
+    sauce.save()
+        .then(() => res.status(201).json({message: 'Sauce enregistrée !'}))
+        .catch(error => res.status(400).json({error}));
+});
+
+// Middleware test
 app.get('/api/sauces', (req, res, next) => {
     const sauces = [
         {
