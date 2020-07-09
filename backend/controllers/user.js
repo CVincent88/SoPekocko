@@ -33,7 +33,7 @@ exports.login = (req, res, next) => {
               token: jsonwt.sign(
                 { userId: user._id },
                 '936A8467672E5466CF266A93651CC',
-                { expiresIn: '24h' }
+                { expiresIn: '2h' }
               )
             });
           })

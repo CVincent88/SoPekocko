@@ -8,8 +8,11 @@ const multer = require('../middleware/multer-config');
 // Middleware pour l'ajout de sauce
 router.post('/', auth, multer, sauceCtrl.createSauce);
 
+// Middleware de like ou dislike de la sauce
+router.post('/:id/like', auth, sauceCtrl.opinionOnSauce);
+
 // Middleware pour la modification d'une sauce
-router.put('/:id', multer, auth,  sauceCtrl.modifySauce);
+router.put('/:id', auth, multer, sauceCtrl.modifySauce);
 
 // Middleware pour la suppression d'une sauce
 router.delete('/:id', auth, sauceCtrl.deleteSauce);
