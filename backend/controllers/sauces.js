@@ -1,5 +1,7 @@
 const Sauce = require('../models/Sauce');
 const fs = require('fs');
+const jwt = require('jsonwebtoken');
+
 
 
 exports.createSauce = (req, res, next) => {
@@ -17,36 +19,36 @@ exports.opinionOnSauce = (req, res, next) => {
   Sauce.findOne({_id: req.params.id})
   .then(sauce => { 
     switch (req.body.like) {
-        case 1 : // Si l'utilisateur aime la sauce
-            if (!sauce.usersLiked.includes(req.body.userId)) {  // Et si il n'a pas déjà aimé la sauce
-              Sauce.updateOne({_id: req.params.id}, {$inc: {likes: 1}, $push: {usersLiked: req.body.userId}, _id: req.params.id})
-              .then(() => res.status(201).json({ message: 'Vous aimez cette sauce !' }))
-              .catch((error) => {res.status(400).json({error: error});});
-            } // On incrémente la variable 'likes' et on met son userId dans le tableau usersLiked
-          break;
-  
-        case -1 :  // Si l'utilisateur n'aime pas la sauce
-            if (!sauce.usersDisliked.includes(req.body.userId)) {  // et qu'il ne l'a pas déjà indiqué
-              Sauce.updateOne({_id: req.params.id}, {$inc: {dislikes: 1}, $push: {usersDisliked: req.body.userId}, _id: req.params.id})
-          .then(() => res.status(201).json({ message: 'Vous n\'aimez pas cette sauce !' }))
-          .catch(error => res.status(400).json({ error }));
-            }  // On incrémente la variable 'dislikes' et on met son userId dans le tableau usersDisliked
-          break;
-  
-        case 0: // Soit on enlève un like, soit un dislike
-            if (sauce.usersLiked.includes(req.body.userId)) { // Si l'userId est déjà dans le tableau on le supprime et on décrémente la variable 'likes'
-              Sauce.updateOne({_id: req.params.id}, {$inc: {likes: -1}, $pull: {usersLiked: req.body.userId}, _id: req.params.id})
-              .then(() => res.status(201).json({ message: 'Vous n\'aimez plus cette sauce !' }))
-              .catch(error => res.status(400).json({ error }));
-            } else if (sauce.usersDisliked.includes(req.body.userId)) { // Si l'userId est déjà dans le tableau on le supprime et on décrémente la variable 'dislikes'
-              Sauce.updateOne({_id: req.params.id}, {$inc: {dislikes: -1}, $pull: {usersDisliked: req.body.userId}, _id: req.params.id})
-              .then(() => res.status(201).json({ message: 'Vous ne détestez plus cette sauce !' }))
-              .catch(error => res.status(400).json({ error })); 
-            }   
-          break;
-        
-        default: // Si aucun des cas précédents ne s'applique, on renvoie un message d'erreur
-          throw { error: "Impossible de modifier vos likes, merci de bien vouloir réessayer ultérieurement" };
+      case 1 : // Si l'utilisateur aime la sauce
+          if (!sauce.usersLiked.includes(req.body.userId)) {  // Et si il n'a pas déjà aimé la sauce
+            Sauce.updateOne({_id: req.params.id}, {$inc: {likes: 1}, $push: {usersLiked: req.body.userId}, _id: req.params.id})
+            .then(() => res.status(201).json({ message: 'Vous aimez cette sauce !' }))
+            .catch((error) => res.status(400).json({error: error}));
+          } // On incrémente la variable 'likes' et on met son userId dans le tableau usersLiked
+        break;
+
+      case -1 :  // Si l'utilisateur n'aime pas la sauce
+          if (!sauce.usersDisliked.includes(req.body.userId)) {  // et qu'il ne l'a pas déjà indiqué
+            Sauce.updateOne({_id: req.params.id}, {$inc: {dislikes: 1}, $push: {usersDisliked: req.body.userId}, _id: req.params.id})
+        .then(() => res.status(201).json({ message: 'Vous n\'aimez pas cette sauce !' }))
+        .catch(error => res.status(400).json({ error }));
+          }  // On incrémente la variable 'dislikes' et on met son userId dans le tableau usersDisliked
+        break;
+
+      case 0: // Soit on enlève un like, soit un dislike
+          if (sauce.usersLiked.includes(req.body.userId)) { // Si l'userId est déjà dans le tableau on le supprime et on décrémente la variable 'likes'
+            Sauce.updateOne({_id: req.params.id}, {$inc: {likes: -1}, $pull: {usersLiked: req.body.userId}, _id: req.params.id})
+            .then(() => res.status(201).json({ message: 'Vous n\'aimez plus cette sauce !' }))
+            .catch(error => res.status(400).json({ error }));
+          } else if (sauce.usersDisliked.includes(req.body.userId)) { // Si l'userId est déjà dans le tableau on le supprime et on décrémente la variable 'dislikes'
+            Sauce.updateOne({_id: req.params.id}, {$inc: {dislikes: -1}, $pull: {usersDisliked: req.body.userId}, _id: req.params.id})
+            .then(() => res.status(201).json({ message: 'Vous ne détestez plus cette sauce !' }))
+            .catch(error => res.status(400).json({ error })); 
+          }   
+        break;
+      
+      default: // Si aucun des cas précédents ne s'applique, on renvoie un message d'erreur
+        throw { error: "Impossible de modifier vos likes, merci de bien vouloir réessayer ultérieurement" };
     }
   })
   .catch(error => res.status(400).json({ error }));
@@ -64,21 +66,32 @@ exports.modifySauce = (req, res, next) => {
 };
 
 exports.deleteSauce = (req, res, next) => {
+
+  const token = req.headers.authorization.split(' ')[1];
+  const decodedToken = jwt.verify(token, '936A8467672E5466CF266A93651CC');
+  const userId = decodedToken.userId;
+  
   Sauce.findOne({_id: req.params.id})
     .then((sauce) => {
-      const filename = sauce.imageUrl.split('/images/')[1];
-      fs.unlink(`images/${filename}`, () => {
+      if(sauce.userId === userId){
+        const filename = sauce.imageUrl.split('/images/')[1];
+        fs.unlink(`images/${filename}`, () => {
         Sauce.deleteOne({_id: req.params.id})
-        .then(() => res.status(200).json('Sauce supprimée'))
-        .catch(error => res.status(400).json({error: error}));
-      });
+          .then(() => res.status(200).json('Sauce supprimée'))
+          .catch(error => res.status(400).json({error: error}));
+        })
+      }else{
+        throw {error: 'Vous ne pouvez pas supprimer les sauces d\'autres utilisateurs'};
+      }
     })
     .catch(error => res.status(404).json({error: error}));
 };
 
 exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id})
-      .then(sauce => res.status(200).json(sauce))
+      .then(sauce => {
+        res.status(200).json(sauce)
+      })
       .catch(error => res.status(404).json({error: error}));
 };
 
