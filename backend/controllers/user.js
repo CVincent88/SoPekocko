@@ -1,23 +1,46 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const passwordValidator = require('password-validator');
+
+const emailRegex = /^[a-zA-Z0-9.\-]{2,20}@([a-zA-Z0-9]{2,15})+(\.[a-zA-Z]{2,3})+((\.[a-zA-Z]{2,3})?)+$/
+
+function isValid(regex, textToTest) {
+  return regex.test(textToTest);
+}
+
+const schemaPassword = new passwordValidator();
+
+schemaPassword // Règles de validation du mot de passe
+.is().min(8)
+.is().max(20)
+.has().uppercase()
+.has().lowercase()
+.has().digits()
+.has().not().spaces();
+
 
 
 exports.signup = (req, res, next) => {
+  if(isValid(emailRegex, req.body.email) && schemaPassword.validate(req.body.password)){
     bcrypt.hash(req.body.password, 10)
-      .then(hash => {
-        const user = new User({
-          email: req.body.email,
-          password: hash
-        });
-        user.save()
-          .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
-          .catch(error => res.status(400).json({ error }));
-      })
-      .catch(error => res.status(500).json({message: 'Impossible d\'enregistrer le nouvel utilisateur'}));
+    .then(hash => {
+      const user = new User({
+        email: req.body.email,
+        password: hash
+      });
+      user.save()
+        .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
+        .catch(error => res.status(400).json({ error }));
+    })
+    .catch(error => res.status(500).json({message: 'Impossible d\'enregistrer le nouvel utilisateur'}));
+  }else
+     throw {error: "L\'adresse email our le mot de passe est incorrect"};
+     console.log(schema.validate(req.body.password, {list: true}));
 };
 
 exports.login = (req, res, next) => {
+  if(isValid(emailRegex, req.body.email) && schemaPassword.validate(req.body.password)){
     User.findOne({ email: req.body.email })
       .then(user => {
         if (!user) {
@@ -40,4 +63,7 @@ exports.login = (req, res, next) => {
           .catch(error => res.status(500).json({ error }));
       })
       .catch(error => res.status(500).json({ error }));
+  }else{
+    throw console.log('L\'adresse email our le mot de passe est incorrect');
+  }
 };
