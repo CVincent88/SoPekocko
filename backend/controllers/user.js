@@ -89,6 +89,7 @@ exports.login = (req, res, next) => {
                 { expiresIn: '1800s' }
               )
             });
+            // bouncer.reset(req);
           })
           .catch(error => res.status(500).json({ error }));
       })

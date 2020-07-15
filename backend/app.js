@@ -12,9 +12,12 @@ const app = express();
 // Logique de connexion à MongoDB
 mongoose.connect('mongodb+srv://SoPekocko_username:SoPekocko_password@sopekocko.wyaor.mongodb.net/<dbname>?retryWrites=true&w=majority',
   { useNewUrlParser: true,
-    useUnifiedTopology: true })
+    useUnifiedTopology: true,
+    useCreateIndex: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
+
+app.use(helmet());
 
 // Middleware permettant l'accès à l'API depuis n'importe quelle origine
 app.use((req, res, next) => {
@@ -23,8 +26,6 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
 });
-
-app.use(helmet());
 
 app.use(bodyParser.json());
 
