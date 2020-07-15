@@ -22,7 +22,7 @@ schemaPassword // Règles de validation du mot de passe
 
 
 exports.signup = (req, res, next) => {
-  if(isValid(emailRegex, req.body.email) && schemaPassword.validate(req.body.password)){
+  if(isValid(emailRegex, req.body.email) && schemaPassword.validate(req.body.password)){ // Protections against SQL injection
     bcrypt.hash(req.body.password, 10)
     .then(hash => {
       const user = new User({
@@ -39,8 +39,38 @@ exports.signup = (req, res, next) => {
      console.log(schema.validate(req.body.password, {list: true}));
 };
 
+// exports.login = (req, res, next) => {
+//   if(isValid(emailRegex, req.body.email) && schemaPassword.validate(req.body.password)){ // protection against SQL injection
+//     User.findOne({ email: req.body.email })
+//       .then(user => {
+//         if (!user) {
+//           return res.status(401).json({ error: 'Utilisateur non trouvé !' });
+//         }
+//         bcrypt.compare(req.body.password, user.password)
+//           .then(valid => {
+//             if (!valid) {
+//               return res.status(401).json({ error: 'Mot de passe incorrect !' });
+//             }
+//             res.status(200).json({
+//               userId: user._id,
+//               token: jwt.sign(
+//                 { userId: user._id },
+//                 '936A8467672E5466CF266A93651CC',
+//                 { expiresIn: '1800s' }
+//               )
+//             });
+//           })
+//           .catch(error => res.status(500).json({ error }));
+//       })
+//       .catch(error => res.status(500).json({ error }));
+//   }else{
+//     throw console.log('L\'adresse email our le mot de passe est incorrect');
+//   }
+// };
+
+
 exports.login = (req, res, next) => {
-  if(isValid(emailRegex, req.body.email) && schemaPassword.validate(req.body.password)){
+  
     User.findOne({ email: req.body.email })
       .then(user => {
         if (!user) {
@@ -63,7 +93,4 @@ exports.login = (req, res, next) => {
           .catch(error => res.status(500).json({ error }));
       })
       .catch(error => res.status(500).json({ error }));
-  }else{
-    throw console.log('L\'adresse email our le mot de passe est incorrect');
-  }
 };
