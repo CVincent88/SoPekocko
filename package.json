@@ -11,6 +11,7 @@
   },
   "private": true,
   "dependencies": {
+    "@angular-devkit/build-angular": "^0.13.0",
     "@angular/animations": "~7.0.0",
     "@angular/cdk": "^7.0.1",
     "@angular/common": "~7.0.0",
@@ -22,6 +23,7 @@
     "@angular/platform-browser": "~7.0.0",
     "@angular/platform-browser-dynamic": "~7.0.0",
     "@angular/router": "~7.0.0",
+    "angular": "^1.8.0",
     "bootstrap": "^4.5.0",
     "core-js": "^2.5.4",
     "express-bouncer": "^0.2.0",
@@ -31,7 +33,6 @@
     "zone.js": "~0.8.26"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.1000.2",
     "@angular/cli": "~7.0.2",
     "@angular/compiler-cli": "~7.0.0",
     "@angular/language-service": "~7.0.0",

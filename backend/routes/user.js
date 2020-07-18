@@ -1,8 +1,7 @@
 const express = require ('express');
 const router = express.Router();
 const userCtrl = require('../controllers/user');
-const bouncer = require ("express-bouncer")(600, 20000, 2); // Protection against bruteforce attacks
-
+const bouncer = require('../middleware/expressBouncer-config');
 
 router.post('/signup', userCtrl.signup);
 

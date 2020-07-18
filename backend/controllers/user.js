@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const passwordValidator = require('password-validator');
+const bouncer = require('../middleware/expressBouncer-config');
 
 const emailRegex = /^[a-zA-Z0-9.\-]{2,20}@([a-zA-Z0-9]{2,15})+(\.[a-zA-Z]{2,3})+((\.[a-zA-Z]{2,3})?)+$/
 
@@ -64,13 +65,12 @@ exports.signup = (req, res, next) => {
 //       })
 //       .catch(error => res.status(500).json({ error }));
 //   }else{
-//     throw console.log('L\'adresse email our le mot de passe est incorrect');
+//     throw console.log('L\'adresse email ou le mot de passe de respecte pas la politique de sécurité.');
 //   }
 // };
 
 
 exports.login = (req, res, next) => {
-  
     User.findOne({ email: req.body.email })
       .then(user => {
         if (!user) {
@@ -80,16 +80,17 @@ exports.login = (req, res, next) => {
           .then(valid => {
             if (!valid) {
               return res.status(401).json({ error: 'Mot de passe incorrect !' });
+            }else{
+              bouncer.reset(req);
+              res.status(200).json({
+                userId: user._id,
+                token: jwt.sign(
+                  { userId: user._id },
+                  '936A8467672E5466CF266A93651CC',
+                  { expiresIn: '1800s' }
+                )
+              });
             }
-            res.status(200).json({
-              userId: user._id,
-              token: jwt.sign(
-                { userId: user._id },
-                '936A8467672E5466CF266A93651CC',
-                { expiresIn: '1800s' }
-              )
-            });
-            // bouncer.reset(req);
           })
           .catch(error => res.status(500).json({ error }));
       })
