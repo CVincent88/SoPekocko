@@ -1,4 +1,4 @@
-const bouncer = require ('express-bouncer')(1800000, 43200000, 5); // Protection against bruteforce attacks. The user will have to wait between 30 minutes and 12 hours after 5 wrong attempts.
+const bouncer = require ('express-bouncer')(1800000, 43200000, 5); // Protection against bruteforce attacks. The user will have to wait between 30 minutes and 12 hours after 5 wrong password attempts.
 
 bouncer.blocked = function (req, res, next, remaining)
 {   

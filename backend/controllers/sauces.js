@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce);
   const sauce = new Sauce({
-      ...sauceObject,
+      ...sauceObject, // Récupération de toutes les propriété de l'objet envoyé en requète
       imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
   });
   sauce.save()
@@ -31,7 +31,7 @@ exports.opinionOnSauce = (req, res, next) => {
           if (!sauce.usersDisliked.includes(req.body.userId)) {  // et qu'il ne l'a pas déjà indiqué
             Sauce.updateOne({_id: req.params.id}, {$inc: {dislikes: 1}, $push: {usersDisliked: req.body.userId}, _id: req.params.id})
         .then(() => res.status(201).json({ message: 'Vous n\'aimez pas cette sauce !' }))
-        .catch(error => res.status(400).json({ error }));
+        .catch(error => res.status(400).json({ error: error }));
           }  // On incrémente la variable 'dislikes' et on met son userId dans le tableau usersDisliked
         break;
 
@@ -67,6 +67,7 @@ exports.modifySauce = (req, res, next) => {
 
 exports.deleteSauce = (req, res, next) => {
 
+  // Appel du jwt pour empêcher de supprimer une sauce depuis un logiciel tiers (e.g. Postman)
   const token = req.headers.authorization.split(' ')[1];
   const decodedToken = jwt.verify(token, '936A8467672E5466CF266A93651CC');
   const userId = decodedToken.userId;
@@ -75,7 +76,7 @@ exports.deleteSauce = (req, res, next) => {
     .then((sauce) => {
       if(sauce.userId === userId){
         const filename = sauce.imageUrl.split('/images/')[1];
-        fs.unlink(`images/${filename}`, () => {
+        fs.unlink(`images/${filename}`, () => {  // Suppression de l'image dans le dossier image
         Sauce.deleteOne({_id: req.params.id})
           .then(() => res.status(200).json('Sauce supprimée'))
           .catch(error => res.status(400).json({error: error}));

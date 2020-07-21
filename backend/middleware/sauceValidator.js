@@ -34,7 +34,7 @@ exports.nameValidator = [  // Sauce name validation
       }),
       validate({
         validator: 'matches',
-        arguments: /^[a-z\d\-\sÂâäÄàÀËëÉéÈèÊÊÎîÏïÔôöÖÛûÜü']+$/i, // Only letters and numbers
+        arguments: /^[a-z\d\-\sÂâäÄàÀËëÉéÈèÊÊÎîÏïÔôöÖÛûÜü',.!]+$/i, // Only letters and numbers
         message: "Vous ne pouvez utiliser que des chiffres et des lettres pour la description de la sauce",
       }),
     ];
@@ -42,7 +42,7 @@ exports.nameValidator = [  // Sauce name validation
     exports.pepperValidator = [  // Main ingredient validation
       validate({
         validator: 'isLength',
-        arguments: [2, 15],  // Has to be between 2 and 15 characters long
+        arguments: [2, 20],  // Has to be between 2 and 15 characters long
         message: 'Le nom de l\'ingrédient principal doit contenir entre {ARGS[0]} and {ARGS[1]} caractères',
       }),
       validate({

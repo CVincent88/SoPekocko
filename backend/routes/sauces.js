@@ -5,22 +5,22 @@ const sauceCtrl = require('../controllers/sauces');
 const auth = require('../middleware/auth');
 const multer = require('../middleware/multer-config');
 
-// Middleware pour l'ajout de sauce
+// Route pour l'ajout de sauce
 router.post('/', auth, multer, sauceCtrl.createSauce);
 
-// Middleware de like ou dislike de la sauce
+// Route de like ou dislike de la sauce
 router.post('/:id/like', auth, sauceCtrl.opinionOnSauce);
 
-// Middleware pour la modification d'une sauce
+// Route pour la modification d'une sauce
 router.put('/:id', auth, multer, sauceCtrl.modifySauce);
 
-// Middleware pour la suppression d'une sauce
+// Route pour la suppression d'une sauce
 router.delete('/:id', auth, sauceCtrl.deleteSauce);
 
-// Middleware de récupération d'une sauce en particulier
+// Route de récupération d'une sauce en particulier
 router.get('/:id', auth, sauceCtrl.getOneSauce);
 
-// Middleware de récupération de toutes les sauces
+// Route de récupération de toutes les sauces
 router.get('/', auth, sauceCtrl.getAllSauces);
 
 module.exports = router;

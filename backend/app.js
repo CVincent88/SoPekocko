@@ -27,6 +27,7 @@ app.use((req, res, next) => {
     next();
 });
 
+// Parse incoming request body in a middleware
 app.use(bodyParser.json());
 
 app.use('/images', express.static(path.join(__dirname, 'images')));

@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken'); // JSON web token configuration
 
 module.exports = (req, res, next) => {
     try{
@@ -15,7 +15,3 @@ module.exports = (req, res, next) => {
         res.status(401).json({error: error | 'Requête non authentifiée !'});
     }
 };
-
-// '936A8467672E5466CF266A93651CC'
-
-// require('crypto').randomBytes(64).toString('hex')
