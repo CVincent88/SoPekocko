@@ -10,6 +10,8 @@ const userRoutes = require('./routes/user');
 const app = express();
 
 // Logique de connexion à MongoDB
+
+// !!! Penser à intégrer les variables d'environnement
 mongoose.connect('mongodb+srv://SoPekocko_username:SoPekocko_password@sopekocko.wyaor.mongodb.net/<dbname>?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useUnifiedTopology: true,
